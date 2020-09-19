@@ -7,20 +7,22 @@ require_once __DIR__ . '/vendor/autoload.php';
 use ReceiptPrintHq\EscposTools\Parser\Parser;
 
 // Usage
-if (!isset($argv[1])) {
-    print("Usage: " . $argv[0] . " filename [-v]\n");
-    die();
+/*if (!isset($argv[1])) {
+print("Usage: " . $argv[0] . " filename [-v]\n");
+die();
 }
 $debug = isset($argv[2]) && $argv[2] == "-v";
 
 // Load in a file
 $fp = fopen($argv[1], 'rb');
+ */
 
+$debug = false;
 $parser = new Parser();
-$parser -> addFile($fp);
+$parser->addBinRaw(1);
 
 // Extract text
-$commands = $parser -> getCommands();
+$commands = $parser->getCommands();
 foreach ($commands as $cmd) {
     if ($debug) {
         // Debug output if requested. List commands and the interface for retrieving the data.
@@ -32,10 +34,17 @@ foreach ($commands as $cmd) {
         $implStr = count($impl) == 0 ? "" : "(" . implode(", ", $impl) . ")";
         fwrite(STDERR, "[DEBUG] $className {$implStr}\n");
     }
-    if ($cmd -> isAvailableAs('TextContainer')) {
-        echo $cmd -> getText();
+    if ($cmd->isAvailableAs('TextContainer')) {
+        echo $cmd->getText();
     }
-    if ($cmd -> isAvailableAs('LineBreak')) {
+
+    if ($cmd->isAvailableAs('PrintAndFeedLinesCmd')) {
+        $line = $cmd->getLineCount();
+        for ($i = 0; $i < $line; $i++) {
+            echo "\n";
+        }
+    }
+    if ($cmd->isAvailableAs('LineBreak')) {
         echo "\n";
     }
 }

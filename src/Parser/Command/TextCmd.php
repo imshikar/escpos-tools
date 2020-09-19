@@ -14,12 +14,12 @@ class TextCmd extends Command implements TextContainer
             // Reject ESC/POS control chars.
             return false;
         }
-        $this -> str .= iconv('CP437', 'UTF-8', $char);
+        $this->str .= $char;
         return true;
     }
 
     public function getText()
     {
-        return $this -> str;
+        return mb_convert_encoding($this->str, "UTF-8", "Big5");
     }
 }
